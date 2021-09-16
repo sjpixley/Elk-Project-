@@ -34,5 +34,28 @@
       enabled: yes
       
       
-      
-      
+ BASH SCRIPTS:https://docs.google.com/document/d/1RI12nUHNLpN3VbZ5HbJrnunxJFJQGsyhmoKAcYDkQsk/edit    
+ 
+ Roulette dealer: #!/bin/bash
+DATE=$1
+TIME=$2
+AMpm=$3
+awk '{print $1," "$2, " "$5," "$6}' $DATE* | grep -i "$TIME.*$AMpm"
+
+
+#!/bin/bash
+awk '{print $1,$2,$5,$6}' 0310_Dealer_schedule | grep "02.*PM"
+
+#!/bin/bash
+awk '{print $1,$2,$5,$6}' 0310_Dealer_schedule | grep "08.*PM"
+
+#!/bin/bash
+awk '{print $1,$2,$5,$6}' 0315_Dealer_schedule | grep "05.*AM"
+
+
+
+
+
+
+
+     
