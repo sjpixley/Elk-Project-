@@ -6,7 +6,154 @@ The files in this repository were used to configure the network depicted below.
 
 These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the _____ file may be used to install only certain pieces of it, such as Filebeat.
 
-  - _TODO: Enter the playbook file._
+  - _TODO: 
+  --
+- name: Config Web VM with Docker
+  hosts: webservers
+  become: true
+  tasks:
+  - name: docker.io
+    apt:
+      force_apt_get: yes
+      update_cache: yes
+      name: docker.io
+      state: present
+
+  - name: Install pip3
+    apt:
+      force_apt_get: yes
+      name: python3-pip
+      state: present
+
+  - name: Install Docker python module
+    pip:
+      name: docker
+      state: present
+
+  - name: download and launch a docker web container
+    docker_container:
+      name: dvwa
+      image: cyberxsecurity/dvwa
+      state: started
+      published_ports: 80:80
+
+  - name: Enable docker service
+    systemd:
+      name: docker
+      enabled: yes
+      
+ELK Install
+      hosts: elk
+become: true
+tasks:
+
+
+name: docker.io
+apt:
+update_cache: yes
+name: docker.io
+state: present
+
+
+sysctl:
+name: vm.max_map_count
+value: '262144'
+state: present
+
+
+name: Install python3-pip3
+apt:
+force_apt_get: yes
+name: python3-pip
+state: present
+
+
+name: Install Docker python module
+pip:
+name: docker
+state: present
+
+
+name: download and launch a docker web container
+docker_container:
+name: elk
+image: sebp/elk:761
+state: present
+restart_policy: always
+published_ports:
+- 5601:5601
+- 9200:9200
+- 5044:5044
+
+
+name: Enable docker service
+systemd:
+name: docker
+enabled: yes
+
+Install Filebeat
+name: installing and launching filebeat
+hosts: webservers
+become: yes
+tasks:
+
+
+name: download filebeat deb
+command: curl -L -O "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.0-amd64.deb"
+
+
+name: install filebeat deb
+command: dpkg -i filebeat-7.4.0-amd64.deb
+
+
+name: drop in filebeat.yml
+copy:
+src: /etc/ansible/files/filebeat-config.yml
+dest: /etc/filebeat/filebeat.yml
+
+
+name: enable and configure system module
+command: filebeat modules enable system
+
+
+name: setup filebeat
+command: filebeat setup
+
+
+name: start filebeat service
+command: sudo service filebeat start
+
+MetricBEAT
+name: installing and launching Metricbeat
+hosts: webservers
+become: yes
+tasks:
+
+
+name: download Metricbeat deb
+command: curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.6.1-amd64.deb
+
+
+name: install metricbeat deb
+command: dpkg -i metricbeat-7.6.1-amd64.deb
+
+
+name: drop in Metricbeat.yml
+copy:
+src: /etc/ansible/files/metricbeat-config.yml
+dest: /etc/metricbeat/metricbeat.yml
+
+
+name: enable and configure system module
+command: metricbeat modules enable docker
+
+
+name: setup metricbeat
+command: sudo metricbeat setup
+
+
+name: start metricbeat service
+command: sudo service metricbeat start
 
 This document contains the following details:
 - Description of the Topologu
@@ -21,7 +168,7 @@ This document contains the following details:
 
 The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
 
-Load balancing ensures that the application will be highly _____, in addition to restricting _____ to the network.
+Load balancing ensures that the application will be highly redundant_____, in addition to restricting access_____ to the network.
 - _TODO: What aspect of security do load balancers protect? What is the advantage of a jump box?_
 
 Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the _____ and system _____.
